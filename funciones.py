@@ -11,7 +11,7 @@ def leer_url(url):
     a un html
 
     Argumentos:
-        Url de la página web
+        url: Url de la página web
     
     Retorna:
         Un html response en la variable soup
@@ -26,7 +26,17 @@ def leer_url(url):
 
     return soup
 
-def crear_tabla(soup):    
+def crear_tabla(soup):
+    """
+    Crea la tabla con las estadísticas de la liga MX del torneo actual y calcula
+    los valores para su racha de victorias y el número de goles.
+
+    Argumentos:
+        soup: La respuesta html de bs4.
+
+    Retorna:
+        df3: Un dataframe con las estadisticas de los equipos
+    """    
     all_data = soup.find_all('tr', {'class': 'ctr-stadistics-header__tr'})
     list = []
     for i in range(1,len(all_data)):
@@ -39,3 +49,12 @@ def crear_tabla(soup):
                 9:"Juegos empatados",10:"Juegos perdidos",
                 11:"Goles a favor",12:"Juegos en contra", 13:"Diferencia de goles", 
                 14:"Puntos"})
+
+    df3["Juegos jugados"] = pd.to_numeric(df3["Juegos jugados"])
+    df3["Juegos ganados"] = pd.to_numeric(df3["Juegos ganados"])
+    df3["Goles a favor"] = pd.to_numeric(df3["Goles a favor"])
+
+    df3["Racha"] = df3["Juegos ganados"] / df3["Juegos jugados"]
+    df3["Over goles"] = df3["Goles a favor"] / df3["Juegos jugados"]
+
+    return df3
